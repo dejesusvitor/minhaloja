@@ -58,20 +58,20 @@ export default async function ComissoesPage() {
                 <div style={{ fontSize: 12.5, color: "var(--ink-softer)" }}>Comissão de {vendedora.comissao_percentual}% por venda</div>
               </div>
             </div>
-            <div style={{ display: "flex", gap: 16, marginTop: 20 }}>
-              <div style={{ flex: 1 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginTop: 20 }}>
+              <div style={{ flex: "1 1 90px" }}>
                 <div className="label">Vendeu</div>
                 <div className="serif" style={{ fontSize: 26, marginTop: 4 }}>
                   {formatMoney(total)}
                 </div>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: "1 1 90px" }}>
                 <div className="label">A receber</div>
                 <div className="serif" style={{ fontSize: 26, marginTop: 4, color: "var(--positive-text)" }}>
                   {formatMoney(comissao)}
                 </div>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: "1 1 90px" }}>
                 <div className="label">Ticket médio</div>
                 <div className="serif" style={{ fontSize: 26, marginTop: 4 }}>
                   {formatMoney(ticketMedio)}
@@ -95,35 +95,37 @@ export default async function ComissoesPage() {
 
       <div className="card" style={{ padding: "6px 22px" }}>
         <div style={{ fontSize: 15, fontWeight: 700, padding: "16px 0 4px" }}>Vendas detalhadas</div>
-        <table className="data">
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Cliente / item</th>
-              <th>Vendedora</th>
-              <th style={{ textAlign: "right" }}>Valor venda</th>
-              <th style={{ textAlign: "right" }}>Comissão</th>
-            </tr>
-          </thead>
-          <tbody>
-            {peds.map((p) => {
-              const v = vends.find((v) => v.id === p.vendedora_id);
-              return (
-                <tr key={p.id}>
-                  <td>{formatDate(p.created_at)}</td>
-                  <td style={{ fontWeight: 600 }}>
-                    {p.cliente?.nome ?? "Cliente avulso"} · {p.itens?.map((i) => i.nome_produto).join(", ")}
-                  </td>
-                  <td>{p.vendedora?.nome ?? "-"}</td>
-                  <td style={{ textAlign: "right", fontWeight: 600 }}>{formatMoney(p.total)}</td>
-                  <td style={{ textAlign: "right", fontWeight: 600, color: "var(--positive-text)" }}>
-                    {formatMoney(v ? (p.total * v.comissao_percentual) / 100 : 0)}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div style={{ overflowX: "auto" }}>
+          <table className="data" style={{ minWidth: 560 }}>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Cliente / item</th>
+                <th>Vendedora</th>
+                <th style={{ textAlign: "right" }}>Valor venda</th>
+                <th style={{ textAlign: "right" }}>Comissão</th>
+              </tr>
+            </thead>
+            <tbody>
+              {peds.map((p) => {
+                const v = vends.find((v) => v.id === p.vendedora_id);
+                return (
+                  <tr key={p.id}>
+                    <td>{formatDate(p.created_at)}</td>
+                    <td style={{ fontWeight: 600 }}>
+                      {p.cliente?.nome ?? "Cliente avulso"} · {p.itens?.map((i) => i.nome_produto).join(", ")}
+                    </td>
+                    <td>{p.vendedora?.nome ?? "-"}</td>
+                    <td style={{ textAlign: "right", fontWeight: 600 }}>{formatMoney(p.total)}</td>
+                    <td style={{ textAlign: "right", fontWeight: 600, color: "var(--positive-text)" }}>
+                      {formatMoney(v ? (p.total * v.comissao_percentual) / 100 : 0)}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         {peds.length === 0 && <div style={{ padding: "20px 0", color: "var(--ink-soft)" }}>Nenhuma venda esta semana ainda.</div>}
       </div>
     </>

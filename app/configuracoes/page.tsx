@@ -215,12 +215,18 @@ export default function ConfiguracoesPage() {
             </div>
           ))}
 
-          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-            <input className="input" placeholder="Nome da colaboradora" value={novoNome} onChange={(e) => setNovoNome(e.target.value)} />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 14 }}>
+            <input
+              className="input"
+              placeholder="Nome da colaboradora"
+              value={novoNome}
+              onChange={(e) => setNovoNome(e.target.value)}
+              style={{ flex: "1 1 160px", minWidth: 0 }}
+            />
             <input
               className="input"
               type="number"
-              style={{ width: 100 }}
+              style={{ width: 90 }}
               value={novaComissao}
               onChange={(e) => setNovaComissao(Number(e.target.value))}
             />

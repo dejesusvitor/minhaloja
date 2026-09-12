@@ -269,14 +269,14 @@ button {
 
 .grid-split {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
 
 .grid-split-wide {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -308,7 +308,7 @@ button {
 @media (max-width: 860px) {
   .grid-split,
   .grid-split-wide {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .grid-cols-5 {
@@ -324,7 +324,7 @@ button {
   .grid-cols-2,
   .grid-cols-4,
   .grid-cols-5 {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -417,6 +417,17 @@ button {
 
 .divider-row {
   border-bottom: 1px solid oklch(90% 0 0);
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  table.data {
+    min-width: 560px;
+  }
 }
 
 table.data {

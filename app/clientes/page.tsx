@@ -103,15 +103,23 @@ export default function ClientesPage() {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        {(["todos", "recorrentes", "atraso"] as const).map((f) => (
-          <button key={f} className={`chip${filtro === f ? " active" : ""}`} onClick={() => setFiltro(f)}>
-            {f === "todos" ? "Todos" : f === "recorrentes" ? "Recorrentes" : "Crediário em atraso"}
-          </button>
-        ))}
-        <div style={{ marginLeft: "auto", display: "flex", gap: 8 }}>
-          <input className="input" placeholder="Nova cliente..." value={novoNome} onChange={(e) => setNovoNome(e.target.value)} style={{ width: 200 }} />
-          <button className="btn btn-primary" onClick={criarCliente}>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {(["todos", "recorrentes", "atraso"] as const).map((f) => (
+            <button key={f} className={`chip${filtro === f ? " active" : ""}`} onClick={() => setFiltro(f)}>
+              {f === "todos" ? "Todos" : f === "recorrentes" ? "Recorrentes" : "Crediário em atraso"}
+            </button>
+          ))}
+        </div>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8, flex: "1 1 260px" }}>
+          <input
+            className="input"
+            placeholder="Nova cliente..."
+            value={novoNome}
+            onChange={(e) => setNovoNome(e.target.value)}
+            style={{ flex: 1, minWidth: 0 }}
+          />
+          <button className="btn btn-primary" onClick={criarCliente} style={{ whiteSpace: "nowrap" }}>
             + Nova cliente
           </button>
         </div>
@@ -126,19 +134,21 @@ export default function ClientesPage() {
               onClick={() => setSelecionadoId(d.cliente.id)}
               className="row divider-row"
               style={{
-                gap: 14,
+                gap: 10,
+                rowGap: 8,
                 padding: "14px 8px",
                 width: "100%",
+                flexWrap: "wrap",
                 background: selecionadoId === d.cliente.id ? "oklch(95% 0 0)" : "transparent",
                 border: "none",
                 borderRadius: 8,
                 textAlign: "left",
               }}
             >
-              <div className="avatar" style={{ background: d.saldo > 0 ? "var(--ink)" : "oklch(92% 0 0)", color: d.saldo > 0 ? "var(--surface)" : "var(--ink-soft)" }}>
+              <div className="avatar" style={{ flexShrink: 0, background: d.saldo > 0 ? "var(--ink)" : "oklch(92% 0 0)", color: d.saldo > 0 ? "var(--surface)" : "var(--ink-soft)" }}>
                 {initials(d.cliente.nome)}
               </div>
-              <div style={{ flex: 1, minWidth: 0, marginLeft: 14 }}>
+              <div style={{ flex: "1 1 140px", minWidth: 0, marginLeft: 14 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <span style={{ fontSize: 14, fontWeight: 600 }}>{d.cliente.nome}</span>
                   {d.numCompras >= 3 && <span style={{ color: "var(--accent-text)", fontSize: 12 }}>↻</span>}
@@ -147,11 +157,13 @@ export default function ClientesPage() {
                   {d.cliente.telefone ?? "sem telefone"} · {d.numCompras} compras
                 </div>
               </div>
-              <span className={`badge ${d.saldo > 0.01 ? "badge-accent" : "badge-positive"}`}>
-                {d.saldo > 0.01 ? `Atrasado · ${d.dias}d` : "Em dia"}
-              </span>
-              <div className="serif" style={{ fontSize: 17, fontWeight: 600, minWidth: 82, textAlign: "right" }}>
-                {formatMoney(d.saldo)}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+                <span className={`badge ${d.saldo > 0.01 ? "badge-accent" : "badge-positive"}`} style={{ whiteSpace: "nowrap" }}>
+                  {d.saldo > 0.01 ? `Atrasado · ${d.dias}d` : "Em dia"}
+                </span>
+                <div className="serif" style={{ fontSize: 17, fontWeight: 600, minWidth: 82, textAlign: "right" }}>
+                  {formatMoney(d.saldo)}
+                </div>
               </div>
             </button>
           ))}
@@ -208,11 +220,11 @@ export default function ClientesPage() {
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: 10 }}>
-              <button className="btn btn-ghost" style={{ flex: 1, justifyContent: "center" }} onClick={registrarPagamento}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <button className="btn btn-ghost" style={{ flex: "1 1 150px", justifyContent: "center" }} onClick={registrarPagamento}>
                 Registrar pagamento
               </button>
-              <button className="btn btn-primary" style={{ flex: 1, justifyContent: "center" }} onClick={cobrarWhatsapp}>
+              <button className="btn btn-primary" style={{ flex: "1 1 150px", justifyContent: "center" }} onClick={cobrarWhatsapp}>
                 Cobrar no WhatsApp
               </button>
             </div>
