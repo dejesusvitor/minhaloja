@@ -44,7 +44,7 @@ export default async function ComissoesPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${vends.length || 1}, minmax(0,1fr))`, gap: 20 }}>
+      <div className="grid-cols-auto">
         {porVendedora.map(({ vendedora, total, comissao, ticketMedio }) => (
           <div key={vendedora.id} className="card" style={{ borderRadius: 14 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>

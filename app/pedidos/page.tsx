@@ -170,7 +170,7 @@ export default function PedidosPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 20, alignItems: "start" }}>
+      <div className="grid-split">
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ display: "flex", gap: 8 }}>
             {(["hoje", "todos", "crediario", "pago"] as const).map((f) => (

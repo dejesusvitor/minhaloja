@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const items = [
   {
@@ -90,6 +91,7 @@ const items = [
 
 export default function Sidebar({ nomeEmpresa }: { nomeEmpresa: string }) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
   const initials = nomeEmpresa
     .split(" ")
     .filter((w) => w.length > 2 || /^[A-ZÀ-Ú]/.test(w))
@@ -98,43 +100,67 @@ export default function Sidebar({ nomeEmpresa }: { nomeEmpresa: string }) {
     .join("")
     .toUpperCase() || "TR";
 
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
-    <div className="sidebar">
-      <div className="sidebar-brand">
-        <div className="sidebar-mark">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="oklch(100% 0 0)" strokeWidth="1.8" strokeLinecap="round">
-            <path d="M4 8 Q12 2 20 8" />
-            <path d="M4 16 Q12 22 20 16" />
-            <path d="M4 8 L4 16" />
-            <path d="M20 8 L20 16" />
+    <>
+      <div className="mobile-topbar">
+        <button className="mobile-menu-btn" onClick={() => setOpen(true)} aria-label="Abrir menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <path d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-        </div>
-        <div className="serif" style={{ fontSize: 23, color: "oklch(98% 0 0)" }}>
+        </button>
+        <div className="serif" style={{ fontSize: 20, color: "oklch(98% 0 0)" }}>
           Trama
         </div>
       </div>
 
-      <nav className="sidebar-nav">
-        {items.map((item) => {
-          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          return (
-            <Link key={item.href} href={item.href} className={`nav-link${active ? " active" : ""}`}>
-              {item.icon}
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      {open && <div className="sidebar-overlay" onClick={() => setOpen(false)} />}
 
-      <div className="sidebar-profile">
-        <div className="avatar">{initials}</div>
-        <div style={{ overflow: "hidden" }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: "oklch(97% 0 0)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-            {nomeEmpresa}
+      <div className={`sidebar${open ? " sidebar-open" : ""}`}>
+        <div className="sidebar-brand">
+          <div className="sidebar-mark">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="oklch(100% 0 0)" strokeWidth="1.8" strokeLinecap="round">
+              <path d="M4 8 Q12 2 20 8" />
+              <path d="M4 16 Q12 22 20 16" />
+              <path d="M4 8 L4 16" />
+              <path d="M20 8 L20 16" />
+            </svg>
           </div>
-          <div style={{ fontSize: 11, color: "oklch(60% 0 0)" }}>Plano Ateliê</div>
+          <div className="serif" style={{ fontSize: 23, color: "oklch(98% 0 0)" }}>
+            Trama
+          </div>
+          <button className="mobile-close-btn" onClick={() => setOpen(false)} aria-label="Fechar menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </div>
+
+        <nav className="sidebar-nav">
+          {items.map((item) => {
+            const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+            return (
+              <Link key={item.href} href={item.href} className={`nav-link${active ? " active" : ""}`}>
+                {item.icon}
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="sidebar-profile">
+          <div className="avatar">{initials}</div>
+          <div style={{ overflow: "hidden" }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "oklch(97% 0 0)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {nomeEmpresa}
+            </div>
+            <div style={{ fontSize: 11, color: "oklch(60% 0 0)" }}>Plano Ateliê</div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -117,7 +117,7 @@ export default function ClientesPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 20, alignItems: "start" }}>
+      <div className="grid-split">
         <div className="card" style={{ padding: "6px 22px" }}>
           {loading && <div style={{ padding: "20px 0", color: "var(--ink-soft)" }}>Carregando...</div>}
           {filtrados.map((d) => (

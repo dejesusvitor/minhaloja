@@ -105,7 +105,7 @@ export default function ConfiguracoesPage() {
         <div className="card" style={{ borderRadius: 14 }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Dados da empresa</div>
           <div style={{ fontSize: 12.5, color: "var(--ink-softer)", marginBottom: 18 }}>Aparecem na nota fiscal e nos recibos enviados aos clientes</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 14 }}>
+          <div className="grid-cols-2">
             <div>
               <label className="label">Nome do ateliê</label>
               <input className="input" value={config.nome_empresa} onChange={(e) => set("nome_empresa", e.target.value)} />

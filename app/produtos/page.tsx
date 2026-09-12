@@ -86,10 +86,10 @@ export default function ProdutosPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: 20, alignItems: "start" }}>
+      <div className="grid-split">
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <input className="input" placeholder="Buscar produto..." value={busca} onChange={(e) => setBusca(e.target.value)} />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0,1fr))", gap: 14 }}>
+          <div className="grid-cols-2">
             {loading && <div style={{ color: "var(--ink-soft)" }}>Carregando...</div>}
             {filtrados.map((p) => (
               <div key={p.id} className="card" style={{ padding: 16, display: "flex", gap: 14 }}>

@@ -73,7 +73,7 @@ export default async function PainelPage() {
         </Link>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(0,1fr))", gap: 16 }}>
+      <div className="grid-cols-5">
         <div className="card">
           <div className="label" style={{ marginBottom: 14 }}>
             Entrou hoje
@@ -122,7 +122,7 @@ export default async function PainelPage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20, alignItems: "start" }}>
+      <div className="grid-split-wide">
         <div className="card" style={{ padding: "22px 24px" }}>
           <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>Atividade recente</div>
           {pedidos.length === 0 && (

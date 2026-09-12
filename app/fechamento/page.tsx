@@ -91,7 +91,7 @@ export default function FechamentoPage() {
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 20 }}>
+      <div className="grid-split">
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div className="card" style={{ borderRadius: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
@@ -106,7 +106,7 @@ export default function FechamentoPage() {
               <div style={{ width: `${(cartao / total) * 100}%`, background: "var(--accent)" }} />
               <div style={{ width: `${(crediarioNovo / total) * 100}%`, background: "oklch(82% 0 0)" }} />
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12 }}>
+            <div className="grid-cols-4">
               {[
                 ["Dinheiro", dinheiro, "var(--positive)"],
                 ["Pix", pix, "oklch(45% 0 0)"],
