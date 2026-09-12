@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { formatMoney, initials } from "@/lib/format";
-import type { Configuracoes, Vendedora } from "@/lib/types";
+import type { Configuracoes, Integracao, Vendedora } from "@/lib/types";
+
+const motivos: Record<string, string> = {
+  sem_credenciais: "As credenciais do Meta ainda não foram configuradas neste projeto. Peça pra quem administra o Vercel adicionar META_APP_ID e META_APP_SECRET nas variáveis de ambiente.",
+  codigo_ausente: "A conexão foi cancelada antes de terminar.",
+  token_invalido: "O Meta recusou a conexão. Tente novamente.",
+  provedor_desconhecido: "Essa integração ainda não está disponível.",
+};
 
 const cores = ["#111111", "#3a3a3a", "#6b6b6b", "#9c9c9c", "#cfcfcf", "#ffffff"];
 
@@ -16,6 +23,10 @@ const faqs = [
   { q: "Como emito nota fiscal de um pedido?", a: 'Ligue "Emitir nota fiscal" ao criar o pedido em Pedidos. A emissão real depende de conectar um provedor fiscal em Integrações.' },
   { q: "Como calculo o preço considerando custo, imposto e taxa de cartão?", a: "Em Produtos, a calculadora de preço já soma custo do fornecedor, logística diluída, embalagem, imposto e taxa de maquininha, e devolve o preço final pela margem que você definir." },
   { q: "Como faço o fechamento do dia?", a: 'Vá em Fechamento e clique em "Fechar o dia". Ele soma tudo que entrou (dinheiro, pix, cartão, crediário novo) e as comissões do dia.' },
+  {
+    q: "Como conecto Instagram e WhatsApp de verdade?",
+    a: 'O botão Conectar já está pronto pra chamar o login do Meta. Falta cadastrar um aplicativo em developers.facebook.com (é gratuito), ativar os produtos "Instagram Graph API" e "WhatsApp Business API" nele, e registrar essa URL de retorno nas configurações do aplicativo: SEU_SITE/api/integracoes/instagram/callback (e a mesma coisa trocando instagram por whatsapp). Depois é só colocar o ID e a chave secreta desse aplicativo nas variáveis de ambiente META_APP_ID e META_APP_SECRET do projeto na Vercel. A partir daí, clicar em Conectar já abre o login de verdade.',
+  },
 ];
 
 export default function ConfiguracoesPage() {
@@ -26,10 +37,19 @@ export default function ConfiguracoesPage() {
   const [faqAberta, setFaqAberta] = useState(0);
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
+  const [integracoes, setIntegracoes] = useState<Record<string, Integracao>>({});
+  const [aviso, setAviso] = useState<{ tipo: "sucesso" | "erro"; texto: string } | null>(null);
 
   async function carregarVendedoras() {
     const { data } = await supabase.from("vendedoras").select("*").order("nome");
     setVendedoras((data as Vendedora[]) ?? []);
+  }
+
+  async function carregarIntegracoes() {
+    const { data } = await supabase.from("integracoes").select("*");
+    const mapa: Record<string, Integracao> = {};
+    (data as Integracao[] ?? []).forEach((i) => (mapa[i.provedor] = i));
+    setIntegracoes(mapa);
   }
 
   useEffect(() => {
@@ -40,7 +60,26 @@ export default function ConfiguracoesPage() {
       .single()
       .then(({ data }) => setConfig(data as Configuracoes));
     carregarVendedoras();
+    carregarIntegracoes();
+
+    const params = new URLSearchParams(window.location.search);
+    const resultado = params.get("integracao");
+    if (resultado === "sucesso") {
+      const provedor = params.get("provedor") ?? "Integração";
+      setAviso({ tipo: "sucesso", texto: `${provedor} conectado com sucesso.` });
+    } else if (resultado === "erro") {
+      const motivo = params.get("motivo") ?? "";
+      setAviso({ tipo: "erro", texto: motivos[motivo] ?? "Não foi possível conectar. Tente novamente." });
+    }
+    if (resultado) {
+      window.history.replaceState(null, "", "/configuracoes");
+    }
   }, []);
+
+  async function desconectar(provedor: string) {
+    await supabase.from("integracoes").update({ conectado: false, access_token: null }).eq("provedor", provedor);
+    carregarIntegracoes();
+  }
 
   function set<K extends keyof Configuracoes>(key: K, value: Configuracoes[K]) {
     setConfig((c) => (c ? { ...c, [key]: value } : c));
@@ -102,6 +141,22 @@ export default function ConfiguracoesPage() {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 20, maxWidth: 760 }}>
+        {aviso && (
+          <div
+            className="card"
+            style={{
+              borderRadius: 14,
+              background: aviso.tipo === "sucesso" ? "var(--positive-soft)" : "var(--accent-soft)",
+              borderColor: "transparent",
+              color: aviso.tipo === "sucesso" ? "var(--positive-text)" : "var(--accent-text)",
+              fontSize: 13,
+              fontWeight: 600,
+            }}
+          >
+            {aviso.texto}
+          </div>
+        )}
+
         <div className="card" style={{ borderRadius: 14 }}>
           <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 4 }}>Dados da empresa</div>
           <div style={{ fontSize: 12.5, color: "var(--ink-softer)", marginBottom: 18 }}>Aparecem na nota fiscal e nos recibos enviados aos clientes</div>
@@ -223,18 +278,45 @@ export default function ConfiguracoesPage() {
             Cada uma dessas precisa de credenciais próprias, que só quem administra as contas consegue gerar
           </div>
           {[
-            ["Instagram", "Vendas por direct viram pedido automaticamente"],
-            ["WhatsApp Business", "Cobrança de crediário e confirmação de pedidos"],
-            ["Google Agenda", "Lembretes de retirada e separação de peças"],
-            ["Meta Ads & cobrança automática", "Cobra o cliente automaticamente via Pix ou cartão após o pedido"],
-          ].map(([nome, desc]) => (
-            <div key={nome} className="row divider-row" style={{ justifyContent: "space-between", padding: "13px 0" }}>
-              <div>
-                <div style={{ fontSize: 13.5, fontWeight: 700 }}>{nome}</div>
-                <div style={{ fontSize: 12, color: "var(--ink-softer)" }}>{desc}</div>
+            { id: "instagram", nome: "Instagram", desc: "Vendas por direct viram pedido automaticamente" },
+            { id: "whatsapp", nome: "WhatsApp Business", desc: "Cobrança de crediário e confirmação de pedidos" },
+          ].map((p) => {
+            const conectado = integracoes[p.id]?.conectado;
+            return (
+              <div key={p.id} className="row divider-row" style={{ justifyContent: "space-between", padding: "13px 0" }}>
+                <div>
+                  <div style={{ fontSize: 13.5, fontWeight: 700 }}>{p.nome}</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-softer)" }}>{p.desc}</div>
+                </div>
+                {conectado ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className="badge badge-accent" style={{ padding: "6px 12px", fontSize: 12 }}>
+                      Conectado
+                    </span>
+                    <button onClick={() => desconectar(p.id)} style={{ background: "none", border: "none", color: "var(--ink-soft)", fontSize: 12.5 }}>
+                      desconectar
+                    </button>
+                  </div>
+                ) : (
+                  <a href={`/api/integracoes/${p.id}/connect`} className="btn btn-ghost" style={{ padding: "8px 16px", fontSize: 12.5 }}>
+                    Conectar
+                  </a>
+                )}
               </div>
-              <span className="btn btn-ghost" style={{ padding: "8px 16px", fontSize: 12.5 }}>
-                Conectar
+            );
+          })}
+
+          {[
+            { nome: "Google Agenda", desc: "Lembretes de retirada e separação de peças" },
+            { nome: "Meta Ads & cobrança automática", desc: "Cobra o cliente automaticamente via Pix ou cartão após o pedido" },
+          ].map((p) => (
+            <div key={p.nome} className="row divider-row" style={{ justifyContent: "space-between", padding: "13px 0" }}>
+              <div>
+                <div style={{ fontSize: 13.5, fontWeight: 700 }}>{p.nome}</div>
+                <div style={{ fontSize: 12, color: "var(--ink-softer)" }}>{p.desc}</div>
+              </div>
+              <span className="btn btn-ghost" style={{ padding: "8px 16px", fontSize: 12.5, opacity: 0.5, cursor: "default" }}>
+                Em breve
               </span>
             </div>
           ))}

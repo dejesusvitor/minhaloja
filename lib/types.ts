@@ -80,6 +80,14 @@ export type Fechamento = {
   fechado_em: string | null;
 };
 
+export type Integracao = {
+  provedor: string;
+  conectado: boolean;
+  access_token: string | null;
+  expira_em: string | null;
+  atualizado_em: string;
+};
+
 export type Configuracoes = {
   id: true;
   nome_empresa: string;
